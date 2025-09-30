@@ -1,18 +1,19 @@
 import argparse
 import os
+import time
 
-LOG_FILE_PATH = "/home/rachel/cs644/server.log"
+LOG_FILE_PATH = "/home/rachel/cs644/http.log"
 
 def run():
     print("running")
-    # open file, create if not exist
-    # TODO to think about: locking
-    fd = os.open(LOG_FILE_PATH, os.O_WRONLY | os.O_CREAT | os.O_APPEND)
-    # append line to log
-    log_line = 'this is a log line'.encode()
-    os.write(fd, log_line)
-    # close file
-    os.close(fd)
+    while True:
+        fd = os.open(LOG_FILE_PATH, os.O_WRONLY | os.O_CREAT | os.O_APPEND)
+        # append line to log
+        log_line = f'this is a log line\n'.encode()
+        os.write(fd, log_line)
+        # close file
+        os.close(fd)
+        time.sleep(1)
 
 def count():
     print("counting")
