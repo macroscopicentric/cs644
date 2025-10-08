@@ -2,18 +2,26 @@ import argparse
 import os
 import time
 
+from datetime import datetime
+
 LOG_FILE_PATH = "/home/rachel/cs644/http.log"
 
 def run():
     print("running")
+    # TODO: fork four child processes
+    # child processes run for a variable amount of time
+    # return from loop below once all four children have exited
     while True:
         fd = os.open(LOG_FILE_PATH, os.O_WRONLY | os.O_CREAT | os.O_APPEND)
         # append line to log
-        log_line = f'this is a log line\n'.encode()
+        time_string = str(datetime.now())
+        print(time_string)
+        log_line = f'{time_string}\n'.encode()
         os.write(fd, log_line)
         # close file
         os.close(fd)
         time.sleep(1)
+    # print status code returns of four children
 
 def count():
     print("counting")
