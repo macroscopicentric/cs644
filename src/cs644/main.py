@@ -11,7 +11,7 @@ def run():
     print("running")
     while True:
         fd = os.open(LOG_FILE_PATH, os.O_WRONLY | os.O_CREAT | os.O_APPEND)
-        fcntl.flock(fd, fcntl.LOCK_EX)
+        fcntl.flock(fd, fcntl.LOCK_SH)
         # append line to log
         time_string = str(datetime.now())
         print(time_string)
