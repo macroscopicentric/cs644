@@ -1,4 +1,5 @@
 import argparse
+import fcntl
 import os
 import time
 
@@ -8,20 +9,18 @@ LOG_FILE_PATH = "/home/rachel/cs644/http.log"
 
 def run():
     print("running")
-    # TODO: fork four child processes
-    # child processes run for a variable amount of time
-    # return from loop below once all four children have exited
     while True:
         fd = os.open(LOG_FILE_PATH, os.O_WRONLY | os.O_CREAT | os.O_APPEND)
+        fcntl.flock(fd, fcntl.LOCK_EX)
         # append line to log
         time_string = str(datetime.now())
         print(time_string)
         log_line = f'{time_string}\n'.encode()
         os.write(fd, log_line)
         # close file
+        fcntl.flock(fd, fcntl.LOCK_UN)
         os.close(fd)
         time.sleep(1)
-    # print status code returns of four children
 
 def count():
     print("counting")
@@ -29,6 +28,7 @@ def count():
     try:
         # read log file and print count of lines
         fd = os.open(LOG_FILE_PATH, os.O_RDONLY)
+        fcntl.flock(fd, fcntl.LOCK_SH)
         # empty file has empty bytestring
         # file with one line has no newlines but non-empty bytestring
         output = os.read(fd, 20).decode()
@@ -37,6 +37,7 @@ def count():
             line_count += len(output.splitlines())
             # don't overcount the second part of a line that has already been partially read
             output = os.read(fd, 20).decode().split('\n', 1)[-1]
+        fcntl.flock(fd, fcntl.LOCK_UN)
         os.close(fd)
     # rescue FileNotFoundError and return 0
     except FileNotFoundError:
