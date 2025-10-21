@@ -1,6 +1,7 @@
 import argparse
 import fcntl
 import os
+import socket
 import time
 
 from datetime import datetime
@@ -9,18 +10,35 @@ LOG_FILE_PATH = "/home/rachel/cs644/http.log"
 
 def run():
     print("running")
+    # TODO: try/except block here
+    sock = socket.socket(socket.AF_INET)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind(('', 3000))
+    # default backlog of 0:
+    sock.listen()
     while True:
+        conn, addr = sock.accept()
+        msg = bytearray()
+        while True:
+            data = conn.recv(1024)
+            print(data)
+            msg.extend(data)
+            conn.send(b'ack\n')
+            if not data: break
         fd = os.open(LOG_FILE_PATH, os.O_WRONLY | os.O_CREAT | os.O_APPEND)
         fcntl.flock(fd, fcntl.LOCK_SH)
         # append line to log
         time_string = str(datetime.now())
-        print(time_string)
-        log_line = f'{time_string}\n'.encode()
+        msg_string = msg.decode().replace('\n', ' ')
+        print_string = f'{time_string}: {msg_string}\n'
+        print(print_string, end='')
+        log_line = print_string.encode()
         os.write(fd, log_line)
         # close file
         fcntl.flock(fd, fcntl.LOCK_UN)
         os.close(fd)
-        time.sleep(1)
+    sock.shutdown(socket.SHUT_RDWR)
+    sock.close()
 
 def count():
     print("counting")
