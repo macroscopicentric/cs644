@@ -12,17 +12,21 @@ LOG_FILE_PATH = "/home/rachel/cs644/http.log"
 def run():
     print("running")
     # TODO: try/except block here
-    sock = socket.socket(socket.AF_INET)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('', 3000))
-    # default backlog of 0:
-    sock.listen()
-    while True:
-        conn, addr = sock.accept()
-        t = Thread(target=handle_client, args=(conn,))
-        t.start()
-    sock.shutdown(socket.SHUT_RDWR)
-    sock.close()
+    try:
+        sock = socket.socket(socket.AF_INET)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind(('', 3000))
+        # default backlog of 0:
+        sock.listen()
+        while True:
+            conn, addr = sock.accept()
+            t = Thread(target=handle_client, args=(conn,))
+            t.start()
+    except KeyboardInterrupt:
+        print("Okay, bye!")
+    finally:
+        sock.shutdown(socket.SHUT_RDWR)
+        sock.close()
 
 def handle_client(conn):
     msg = bytearray()
