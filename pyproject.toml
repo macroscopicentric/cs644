@@ -11,7 +11,10 @@ dependencies = [
 ]
 
 [tool.poetry]
-packages = [{include = "cs644", from = "src"}]
+packages = [{include = "src"}]
+
+[tool.poetry.scripts]
+main = "src.main:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
