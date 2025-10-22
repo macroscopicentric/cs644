@@ -12,7 +12,6 @@ LOG_FILE_PATH = "/home/rachel/cs644/http.log"
 
 def run():
     print("running")
-    # TODO: try/except block here
     try:
         sock = socket.socket(socket.AF_INET)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -21,9 +20,13 @@ def run():
         sock.listen()
         while True:
             conn, addr = sock.accept()
+            # TODO: use _thread instead of Threading
+            # https://docs.python.org/3/library/_thread.html#module-_thread
             t = Thread(target=handle_client, args=(conn,))
             t.start()
     except KeyboardInterrupt:
+        # TODO: refactor to wait until all existing threads have terminated via t.join()
+        # https://docs.python.org/3/library/threading.html#introduction
         print("Okay, bye!")
     finally:
         sock.shutdown(socket.SHUT_RDWR)
